@@ -1,12 +1,16 @@
 package com.example.ssurendran.allinoneapp
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-
+import android.widget.Toast
+import com.example.ssurendran.allinoneapp.model.User
+import com.example.ssurendran.allinoneapp.retrofit.SampleAPI
+import com.example.ssurendran.allinoneapp.retrofit.SampleRetrofitClient
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,24 +20,30 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+
+            SampleRetrofitClient().getSampleAPI().getUser(1).enqueue(object: Callback<User>{
+                override fun onFailure(call: Call<User>?, t: Throwable?) {
+                    Toast.makeText(this@MainActivity, "Failure: ${t.toString()}", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onResponse(call: Call<User>?, response: Response<User>?) {
+                    if (response?.isSuccessful == true) {
+                        userTv.text = response.body().toString()
+                    } else{
+                        Toast.makeText(this@MainActivity, "Error: ${response?.errorBody()}", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+            })
+
+
+            //do with normal internet call httpConnection
+
+            //do with call.execute from within coroutines
+
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
+
 }
